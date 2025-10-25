@@ -65,7 +65,7 @@
   <button id="signout_button">Sign Out</button>
   <div class="row">
     <input type="text" id="searchBar" placeholder="Search stock item..." />
-    <div id="suggestions" class="suggestions" style="display:none;"></div>
+    <div id="suggestions" class="suggestions" style="display:none"></div>
     <select id="dropdown"><option value="">Select stock item...</option></select>
   </div>
   <div class="item-table" id="itemTable"></div>
@@ -188,16 +188,16 @@ function populateDropdown() {
     }
   });
 }
-searchBar.addEventListener('input', () => {
+searchBar.addEventListener('input', () =>{
   const val = searchBar.value.toLowerCase().trim();
   suggestionsDiv.innerHTML = '';
-  if (!val) {suggestionsDiv.style.display = 'none'; return;}
-  const filtered = items.filter(i => i.name.toLowerCase().includes(val));
-  filtered.forEach(i => {
+  if(!val){suggestionsDiv.style.display = 'none'; return;}
+  const filtered = items.filter(i=>i.name.toLowerCase().includes(val));
+  filtered.forEach(i=>{
     const div = document.createElement('div');
     div.className = 'suggestion';
     div.textContent = `${i.name} (Stock: ${i.stock}, Pg: ${i.page})`;
-    div.onclick = () => {
+    div.onclick = ()=>{
       showItem(i);
       searchBar.value = i.name;
       dropdown.value = i.sno;
@@ -205,29 +205,29 @@ searchBar.addEventListener('input', () => {
     };
     suggestionsDiv.appendChild(div);
   });
-  suggestionsDiv.style.display = filtered.length? 'block':'none';
+  suggestionsDiv.style.display = filtered.length ? 'block' : 'none';
 });
-document.addEventListener('click', e => {
-  if (!suggestionsDiv.contains(e.target) && e.target !== searchBar) suggestionsDiv.style.display = 'none';
+document.addEventListener('click', e =>{
+  if(!suggestionsDiv.contains(e.target) && e.target !== searchBar) suggestionsDiv.style.display = 'none';
 });
-dropdown.addEventListener('change', () => {
+dropdown.addEventListener('change', ()=>{
   const sno = parseInt(dropdown.value);
-  if (!sno) return;
-  const item = items.find(i => i.sno === sno);
-  if (item) {
+  if(!sno) return;
+  const item = items.find(i=>i.sno === sno);
+  if(item){
     showItem(item);
     searchBar.value = item.name;
   }
 });
 
-function renderHistoryTable(item) {
+function renderHistoryTable(item){
   if(!item.history.length) return '<div>No stock change history.</div>';
   let html = `<div class="history-title">Stock Change History</div><table class="history-table"><thead><tr><th>#</th><th>Date & Time</th><th>Old Stock</th><th>New Stock</th><th>Received/Sent</th><th>Remarks</th><th>Actions</th></tr></thead><tbody>`;
   item.history.forEach((entry,i)=>{
     const diff = entry.new - entry.old;
-    const sign = diff>0?'+':diff<0?'-':'';
-    const diffClass = diff>0?'received':diff<0?'sent':'';
-    html+=`<tr data-idx="${i}">
+    const sign = diff >0 ? '+' : diff < 0 ? '-' : '';
+    const diffClass = diff > 0 ? 'received' : diff <0 ? 'sent' : '';
+    html += `<tr data-idx="${i}">
       <td>${i+1}</td>
       <td>${entry.date || ''}</td>
       <td>${entry.old || ''}</td>
@@ -240,11 +240,12 @@ function renderHistoryTable(item) {
       <td><button class="history-delete" data-idx="${i}" style="background:#e35b5b;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">Delete</button></td>
     </tr>`;
   });
-  return html+'</tbody></table>';
+  html+='</tbody></table>';
+  return html;
 }
 function showItem(item){
-  currentItem=item;
-  itemTable.innerHTML=`
+  currentItem = item;
+  itemTable.innerHTML = `
     <table>
       <thead>
         <tr><th>S.No.</th><th>Name</th><th>Stock</th><th>Page Number(s)</th><th>Actions</th></tr>
@@ -264,205 +265,233 @@ function showItem(item){
         </tr>
         <tr><td colspan="5">
           <label for="notesEdit" style="font-weight:bold;">Additional Notes:</label>
-          <textarea id="notesEdit" class="textarea-editable" placeholder="Additional notes">${item.notes||''}</textarea>
+          <textarea id="notesEdit" class="textarea-editable" placeholder="Additional notes">${item.notes || ''}</textarea>
         </td></tr>
       </tbody>
     </table>
-    <div class="history-container">${renderHistoryTable(item)}</div>`;
+    <div class="history-container">${renderHistoryTable(item)}</div>
+  `;
 
-  const nameDisplay=document.getElementById('nameDisplay');
-  const nameEditInput=document.getElementById('nameEdit');
-  const nameEditBtn=document.getElementById('nameEditBtn');
-  const nameSaveBtn=document.getElementById('nameSaveBtn');
-  nameEditBtn.onclick=()=>{
-    nameDisplay.style.display='none';
-    nameEditInput.style.display='inline-block';
-    nameEditBtn.style.display='none';
-    nameSaveBtn.style.display='inline-block';
+  const nameDisplay = document.getElementById('nameDisplay');
+  const nameEditInput = document.getElementById('nameEdit');
+  const nameEditBtn = document.getElementById('nameEditBtn');
+  const nameSaveBtn = document.getElementById('nameSaveBtn');
+  nameEditBtn.onclick = () => {
+    nameDisplay.style.display = 'none';
+    nameEditInput.style.display = 'inline-block';
+    nameEditBtn.style.display = 'none';
+    nameSaveBtn.style.display = 'inline-block';
     nameEditInput.focus();
   };
-  nameSaveBtn.onclick=async()=>{
-    const newName=nameEditInput.value.trim();
-    if(newName){
-      nameDisplay.textContent=newName;
-      currentItem.name=newName;
-      await updateItemField('name',newName);
+  nameSaveBtn.onclick = async () => {
+    const newName = nameEditInput.value.trim();
+    if(newName) {
+      nameDisplay.textContent = newName;
+      currentItem.name = newName;
+      await updateItemField('name', newName);
       populateDropdown();
     }
-    nameDisplay.style.display='inline';
-    nameEditInput.style.display='none';
-    nameEditBtn.style.display='inline-block';
-    nameSaveBtn.style.display='none';
+    nameDisplay.style.display = 'inline';
+    nameEditInput.style.display = 'none';
+    nameEditBtn.style.display = 'inline-block';
+    nameSaveBtn.style.display = 'none';
   };
-  document.getElementById('itemSaveBtn').onclick=()=>saveEdits(item.sno);
-  document.getElementById('itemDelBtn').onclick=()=> {if(confirm('Are you sure you want to delete this stock item?')) deleteItem(item.sno);};
+  document.getElementById('itemSaveBtn').onclick = () => saveEdits(item.sno);
+  document.getElementById('itemDelBtn').onclick = () => { if(confirm('Are you sure you want to delete this stock item?')) deleteItem(item.sno); };
 
   // History remark save buttons
-  itemTable.querySelectorAll('.history-remark-save').forEach(button=>{
-    button.onclick=async e=>{
-      const idx=parseInt(e.target.getAttribute('data-idx'));
-      const textarea=itemTable.querySelector(`textarea.history-remark-edit[data-idx='${idx}']`);
+  itemTable.querySelectorAll('.history-remark-save').forEach(button => {
+    button.onclick = async e => {
+      const idx = parseInt(e.target.getAttribute('data-idx'));
+      const textarea = itemTable.querySelector(`textarea.history-remark-edit[data-idx='${idx}']`);
       if(textarea && currentItem.history && currentItem.history[idx]){
-        currentItem.history[idx].remark=textarea.value.trim();
+        currentItem.history[idx].remark = textarea.value.trim();
         await saveHistoryToSheet(currentItem.name);
         alert('Remark saved.');
       }
     };
   });
+
   // History delete buttons
-  itemTable.querySelectorAll('.history-delete').forEach(button=>{
-    button.onclick=async e=>{
-      const idx=parseInt(e.target.getAttribute('data-idx'));
+  itemTable.querySelectorAll('.history-delete').forEach(button => {
+    button.onclick = async e => {
+      const idx = parseInt(e.target.getAttribute('data-idx'));
       if(confirm('Are you sure you want to delete this stock change history?')){
-        currentItem.history.splice(idx,1);
+        currentItem.history.splice(idx, 1);
+
+        // Roll back stock to previous value or 0 if no history
+        if(currentItem.history.length > 0){
+          currentItem.stock = currentItem.history[currentItem.history.length - 1].new;
+        } else {
+          currentItem.stock = 0;
+        }
+
+        // Save stock update to main sheet
+        await saveItemToSheet(currentItem);
+
+        // Save updated history to history sheet
         await saveHistoryToSheet(currentItem.name);
-        alert('History entry deleted.');
+
+        alert('Stock history deleted and stock count rolled back.');
         showItem(currentItem);
       }
     };
   });
 }
-async function updateItemField(field,value){
+
+async function updateItemField(field, value){
   if(!currentItem) return;
-  currentItem[field]=value;
+  currentItem[field] = value;
   await saveItemToSheet(currentItem);
 }
+
 async function saveEdits(sno){
-  const stockInput=document.getElementById('stockEdit');
-  const pageInput=document.getElementById('pageEdit');
-  const notesInput=document.getElementById('notesEdit');
-  const stockVal=parseInt(stockInput.value,10);
-  const pageVal=pageInput.value.trim();
-  const notesVal=notesInput.value.trim();
-  if(isNaN(stockVal) || stockVal<0)
-    return alert('Stock must be a non-negative integer.');
-  if(!/^(\d+(-\d+)?)(,(\d+(-\d+)?))*$/.test(pageVal.replace(/\s/g,'')))
-    return alert('Invalid page numbers. Example: 1,3-5,8');
-  const idx=items.findIndex(i=>i.sno===sno);
-  if(idx===-1) return alert('Item not found.');
-  const item=items[idx];
-  if(item.stock!==stockVal){
-    const now=new Date().toISOString();
+  const stockInput = document.getElementById('stockEdit');
+  const pageInput = document.getElementById('pageEdit');
+  const notesInput = document.getElementById('notesEdit');
+  const stockVal = parseInt(stockInput.value, 10);
+  const pageVal = pageInput.value.trim();
+  const notesVal = notesInput.value.trim();
+  if (isNaN(stockVal) || stockVal < 0) return alert('Stock must be a non-negative integer.');
+  if (!/^(\d+(-\d+)?)(,(\d+(-\d+)?))*$/.test(pageVal.replace(/\s/g, ''))) return alert('Invalid page numbers. Example: 1,3-5,8');
+  const idx = items.findIndex(i => i.sno === sno);
+  if (idx === -1) return alert('Item not found.');
+  const item = items[idx];
+  if (item.stock !== stockVal) {
+    const now = new Date().toISOString();
     item.history.push({
       date: now,
       old: item.stock,
       new: stockVal,
-      receivedSent: (stockVal > item.stock) ? `+${stockVal - item.stock}` : `-${item.stock - stockVal}`,
+      receivedSent: stockVal > item.stock ? `+${stockVal - item.stock}` : `-${item.stock - stockVal}`,
       remark: ''
     });
     item.stock = stockVal;
-    await appendHistoryRow(item.name, now, item.history[item.history.length-1]);
+    await appendHistoryRow(item.name, now, item.history[item.history.length - 1]);
   }
-  item.page=pageVal;
-  item.notes=notesVal;
-  items[idx]=item;
+  item.page = pageVal;
+  item.notes = notesVal;
+  items[idx] = item;
   await saveItemToSheet(item);
   alert(`Saved changes for "${item.name}".`);
   populateDropdown();
   showItem(item);
 }
+
 async function appendHistoryRow(itemName, timestamp, historyEntry){
   await gapi.client.sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
     range: `${getHistorySheet()}!A:F`,
-    valueInputOption: 'RAW',
-    insertDataOption:'INSERT_ROWS',
-    resource:{
-      values: [[
-        itemName,
-        timestamp,
-        historyEntry.old,
-        historyEntry.new,
-        historyEntry.receivedSent,
-        historyEntry.remark || ''
-      ]]
-    }
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    resource: {
+      values: [[itemName, timestamp, historyEntry.old, historyEntry.new, historyEntry.receivedSent, historyEntry.remark || ""]],
+    },
   });
 }
+
 async function saveHistoryToSheet(itemName){
-  // Delete all history of item, re-append current history from items array (simplified)
+  // Clear sheet then re-append updated history for current item
   const historyRows = [];
-  items.forEach(item=>{
-    if(item.name===itemName && item.history){
-      item.history.forEach(h=>{
-        historyRows.push([item.name, h.date, h.old, h.new, h.receivedSent, h.remark||'']);
+  items.forEach(item => {
+    if(item.name === itemName && item.history) {
+      item.history.forEach(h => {
+        historyRows.push([item.name, h.date, h.old, h.new, h.receivedSent, h.remark || ""]);
       });
     }
   });
-  await gapi.client.sheets.spreadsheets.values.clear({spreadsheetId: SPREADSHEET_ID, range: `${getHistorySheet()}!A2:F`});
-  if(historyRows.length>0){
+  await gapi.client.sheets.spreadsheets.values.clear({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${getHistorySheet()}!A2:F`
+  });
+  if(historyRows.length > 0) {
     await gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
       range: `${getHistorySheet()}!A2:F`,
-      valueInputOption: 'RAW',
-      resource:{values: historyRows}
+      valueInputOption: "RAW",
+      resource: { values: historyRows }
     });
   }
 }
+
 async function saveItemToSheet(item){
-  const idx=items.findIndex(i=>i.sno===item.sno);
-  if(idx===-1) return;
-  const range=`${getItemSheet()}!A${idx+2}:E${idx+2}`;
+  const idx = items.findIndex(i => i.sno === item.sno);
+  if(idx === -1) return;
+  const range = `${getItemSheet()}!A${idx+2}:E${idx+2}`;
   await gapi.client.sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
     range,
     valueInputOption: 'RAW',
-    resource: {values: [[item.sno, item.name, item.stock, item.page, item.notes]]}
+    resource: { values: [[item.sno, item.name, item.stock, item.page, item.notes]] }
   });
-  items[idx]=item;
+  items[idx] = item;
 }
+
 async function deleteItem(sno){
-  if(!confirm('Are you sure to delete this stock item?')) return;
-  const idx=items.findIndex(i=>i.sno===sno);
-  if(idx===-1) return alert('Item not found.');
-  const item=items[idx];
+  if(!confirm('Are you sure you want to delete this stock item?')) return;
+  const idx = items.findIndex(i => i.sno === sno);
+  if(idx === -1) return alert('Item not found.');
   items.splice(idx,1);
   alert('Deleted item locally. Please remove its row in Google Sheets manually.');
   populateDropdown();
-  itemTable.innerHTML='';
-  searchBar.value='';
+  itemTable.innerHTML = '';
+  searchBar.value = '';
 }
+
 function downloadExcel(){
-  const XLSX=window.XLSX;
-  const mainHeaders=['S.No.', 'Name of Item', 'Stock', 'Page Number(s)', 'Notes'];
-  const historyHeaders=['Date & Time','Old Stock','New Stock','Received/Sent','Remarks'];
-  let data=[[...mainHeaders, 'Stock Change History']];
-  data.push(['','','','','', ...historyHeaders]);
-  items.forEach(item=>{
-    const history=item.history||[];
-    if(history.length===0){
-      data.push([item.sno,item.name,item.stock,item.page,item.notes,'','','','','']);
-    }else{
-      const h0=history[0];
-      const diff0=h0.new - h0.old;
-      const sign0=diff0>0?'+':diff0<0?'-':'';
-      data.push([item.sno,item.name,item.stock,item.page,item.notes,h0.date||'',h0.old,h0.new,`${sign0}${Math.abs(diff0)}`,h0.remark||'']);
-      for(let i=1;i<history.length;i++){
-        const h=history[i];
-        const diff=h.new - h.old;
-        const sign=diff>0?'+':diff<0?'-':'';
-        data.push(['','','','','',h.date||'',h.old,h.new,`${sign}${Math.abs(diff)}`,h.remark||'']);
+  const XLSX = window.XLSX;
+  const mainHeaders = ['S.No.', 'Name of Item', 'Stock', 'Page Number(s)', 'Notes'];
+  const historyHeaders = ['Date & Time', 'Old Stock', 'New Stock', 'Received/Sent', 'Remarks'];
+  let data = [[...mainHeaders, 'Stock Change History']];
+  data.push(['', '', '', '', '', ...historyHeaders]);
+
+  items.forEach(item => {
+    const history = item.history || [];
+    if(history.length === 0){
+      data.push([item.sno, item.name, item.stock, item.page, item.notes,'','','','','']);
+    } else {
+      const h0 = history[0];
+      const diff0 = h0.new - h0.old;
+      const sign0 = diff0 > 0 ? '+' : diff0 < 0 ? '-' : '';
+      data.push([
+        item.sno, item.name, item.stock, item.page, item.notes,
+        h0.date || '', h0.old, h0.new, `${sign0}${Math.abs(diff0)}`, h0.remark || ''
+      ]);
+      for(let i = 1; i < history.length; i++){
+        const h = history[i];
+        const diff = h.new - h.old;
+        const sign = diff > 0 ? '+' : diff < 0 ? '-' : '';
+        data.push(['', '', '', '', '', h.date || '', h.old, h.new, `${sign}${Math.abs(diff)}`, h.remark || '']);
       }
     }
   });
-  const ws=XLSX.utils.aoa_to_sheet(data);
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
   ws['!merges'] = ws['!merges'] || [];
-  ws['!merges'].push({s:{r:0,c:5},e:{r:0,c:9}});
-  ws['!cols']=[
-    {wch:6},{wch:30},{wch:10},{wch:15},{wch:30},{wch:20},{wch:10},{wch:10},{wch:12},{wch:30}
+  ws['!merges'].push({ s: {r:0,c:5}, e: {r:0,c:9}});
+  ws['!cols'] = [
+    {wch:6}, {wch:30}, {wch:10}, {wch:15}, {wch:30},
+    {wch:20}, {wch:10}, {wch:10}, {wch:12}, {wch:30}
   ];
-  Object.entries(ws).forEach(([addr,cell])=>{
+
+  Object.entries(ws).forEach(([addr, cell]) => {
     if(['F','G','H','I','J'].includes(addr.charAt(0)) && !['F1','G1','H1','I1','J1','F2','G2','H2','I2','J2'].includes(addr)){
-      if(!cell.s) cell.s={};
-      cell.s.alignment={wrapText:true,vertical:'top'};
+      if(!cell.s) cell.s = {};
+      cell.s.alignment = {wrapText:true,vertical:'top'};
     }
   });
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Stock Data');
-  XLSX.writeFile(wb,'e-ledger-kakinada-stock.xlsx');
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Stock Data');
+  XLSX.writeFile(wb, 'e-ledger-kakinada-stock.xlsx');
 }
-downloadBtn.addEventListener('click',downloadExcel);
-window.onload=()=>{gapiLoaded();gisLoaded();};
+downloadBtn.addEventListener('click', downloadExcel);
+
+// Initialize APIs on window load
+window.onload = () => {
+  gapiLoaded();
+  gisLoaded();
+};
 </script>
 </body>
 </html>
